@@ -11,10 +11,10 @@ public class Room {
     protected double furnitureMaxSpace;
     protected double freeSpacePercent;
     protected int illumination;
-    private static final int WINDOW_BRIGHTNESS = 700;
-    private static final int MIN_ILLUMINATION = 300;
-    private static final int MAX_ILLUMINATION = 4000;
-    private static final int MIN_FREE_SPACE_PERCENT = 30;
+    public static final int WINDOW_BRIGHTNESS = 700;
+    public static final int MIN_ILLUMINATION = 300;
+    public static final int MAX_ILLUMINATION = 4000;
+    public static final int MIN_FREE_SPACE_PERCENT = 30;
 
     public Room(String roomName) throws IlluminanceTooMuchException {
         name = roomName;
@@ -91,11 +91,9 @@ public class Room {
         }
     }
 
-    public boolean checkIllumination() {
+    public void checkIllumination() throws IlluminanceTooLittleException {
         if (illumination < MIN_ILLUMINATION || illumination > MAX_ILLUMINATION) {
-            return false;
-        } else {
-            return true;
+            throw new IlluminanceTooLittleException(name, illumination);
         }
     }
 
@@ -104,7 +102,7 @@ public class Room {
         StringBuffer message = new StringBuffer();
         message.append(name).append("\n");
 
-        message.append("Освещенность = ").append(illumination).append(" (Кол-во окон: ").append(numberOfWindows).append(" по 700 лк, ");
+        message.append("Освещенность = ").append(illumination).append(" (Кол-во окон: ").append(numberOfWindows).append(" по "+ WINDOW_BRIGHTNESS +" лк, ");
         if (lamps.isEmpty()) {
             message.append("лампочек нет.) \n");
         } else {

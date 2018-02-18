@@ -44,10 +44,10 @@ public class Furniture {
     public String describe() {
         String result;
         if (minSpace == maxSpace) {
-            result = "\"" + name + "\" (площадь " + minSpace + "m2)";
+            result = "\"" + name + "\" (площадь " + minSpace + " м2)";
             return result;
         } else {
-            result = "\"" + name + "\" (площадь от " + minSpace + "m2 до " + maxSpace + "m2)";
+            result = "\"" + name + "\" (площадь от " + minSpace + " м2 до " + maxSpace + "m2)";
             return result;
         }
     }
