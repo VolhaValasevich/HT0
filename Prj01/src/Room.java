@@ -16,7 +16,7 @@ public class Room {
     private static final int MAX_ILLUMINATION = 4000;
     private static final int MIN_FREE_SPACE_PERCENT = 30;
 
-    public Room(String roomName){
+    public Room(String roomName) throws IlluminanceTooMuchException {
         name = roomName;
         space = 0;
         lamps = new ArrayList<>();
@@ -26,11 +26,14 @@ public class Room {
         furnitureMinSpace = 0;
         furnitureMaxSpace = 0;
         freeSpacePercent = 100;
-        illumination = numberOfWindows * WINDOW_BRIGHTNESS;
-        //бросить эксепшн
+        if (numberOfWindows*WINDOW_BRIGHTNESS > MAX_ILLUMINATION) {
+            throw new IlluminanceTooMuchException(name, numberOfWindows*WINDOW_BRIGHTNESS);
+        } else {
+            illumination = numberOfWindows * WINDOW_BRIGHTNESS;
+        }
     }
 
-    public Room(String roomName, double roomSpace){
+    public Room(String roomName, double roomSpace) throws IlluminanceTooMuchException {
         name = roomName;
         space = roomSpace;
         lamps = new ArrayList<>();
@@ -40,11 +43,14 @@ public class Room {
         furnitureMinSpace = 0;
         furnitureMaxSpace = 0;
         freeSpacePercent = 100;
-        illumination = numberOfWindows * WINDOW_BRIGHTNESS;
-        //бросить эксепшн
+        if (numberOfWindows*WINDOW_BRIGHTNESS > MAX_ILLUMINATION) {
+            throw new IlluminanceTooMuchException(name, numberOfWindows*WINDOW_BRIGHTNESS);
+        } else {
+            illumination = numberOfWindows * WINDOW_BRIGHTNESS;
+        }
     }
 
-    public Room(String roomName, double roomSpace, int windowsNumber){
+    public Room(String roomName, double roomSpace, int windowsNumber) throws IlluminanceTooMuchException {
         name = roomName;
         space = roomSpace;
         lamps = new ArrayList<>();
@@ -54,14 +60,17 @@ public class Room {
         furnitureMinSpace = 0;
         furnitureMaxSpace = 0;
         freeSpacePercent = 100;
-        illumination = numberOfWindows * WINDOW_BRIGHTNESS;
-        //бросить эксепшн
+        if (numberOfWindows*WINDOW_BRIGHTNESS > MAX_ILLUMINATION) {
+            throw new IlluminanceTooMuchException(name, numberOfWindows*WINDOW_BRIGHTNESS);
+        } else {
+            illumination = numberOfWindows * WINDOW_BRIGHTNESS;
+        }
     }
 
-    public boolean add(Furniture object) {
-        if (((space - furnitureMaxSpace - object.getMaxSpace())/space) < (MIN_FREE_SPACE_PERCENT / 100)) {
-            //throw exception SpaceUsageTooMuchException
-            return false;
+    public boolean add(Furniture object) throws SpaceUsageTooMuchException {
+        double percent = (space - furnitureMaxSpace - object.getMaxSpace())/space;
+        if (percent < (MIN_FREE_SPACE_PERCENT / 100)) {
+            throw new SpaceUsageTooMuchException(name, percent);
         } else {
             furniture.add(object);
             furnitureMaxSpace = furnitureMaxSpace + object.getMaxSpace();
@@ -71,10 +80,9 @@ public class Room {
         }
     }
 
-    public boolean add (Lamp object) {
+    public boolean add (Lamp object) throws IlluminanceTooMuchException {
         if (illumination + object.getBrightness() > MAX_ILLUMINATION) {
-            //throw exception IlluminanceTooMuchException
-            return false;
+            throw new IlluminanceTooMuchException(name, illumination+object.getBrightness());
         } else {
             lamps.add(object);
             lampBrightness = lampBrightness + object.getBrightness();
@@ -105,11 +113,6 @@ public class Room {
                 message.append(v.getBrightness()).append(" лк ");
             }
             message.append(") \n");
-        }
-
-        //вместо этого кидать эксепшн при описании здания
-        if (illumination < MIN_ILLUMINATION) {
-            message.append("ВНИМАНИЕ: Слишком низкий уровень освещенности! Минимально допустимый уровень освещенности: 300 лк.");
         }
 
         message.append("Площадь: ").append(space).append(" м2 (занято ");

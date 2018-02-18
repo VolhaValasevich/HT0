@@ -22,7 +22,7 @@ public class Building {
         System.out.println(message);
     }
 
-    public boolean checkRoomsIllumination() {
+    private boolean checkRoomsIllumination() {
         boolean flag = true;
         for (Room v : rooms) {
             if (!v.checkIllumination()) {
