@@ -61,8 +61,11 @@ public class AudioParser {
                 getParams(p);
                 Mp3File newMp3 = new Mp3File(title, artist, album, duration, p.getPath(), hash);
                 results.add(newMp3);
+                System.out.println("add " + newMp3.getTitle());
                 if (allHash.contains(newMp3.getHash())) {
                     hashDups.add(newMp3);
+                } else {
+                    allHash.add(newMp3.getHash());
                 }
             }
         }

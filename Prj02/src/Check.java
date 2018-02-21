@@ -16,7 +16,7 @@ public class Check {
     }
 
     public static boolean ifMp3 (String s) {
-        Pattern p = Pattern.compile("^[a-zA-Z]{1}:/(([a-zA-Z0-9/_-]|\\s)+|/{1})\\.[Mm][pP]3$");
+        Pattern p = Pattern.compile(".+.[mM][pP]3$");
         Matcher m = p.matcher(s);
         return m.matches();
     }
