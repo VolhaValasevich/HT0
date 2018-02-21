@@ -24,7 +24,7 @@ public class AudioParser {
     private String duration;
     private byte[] hash;
     private HashSet<byte[]> allHash;               //all hash codes
-    private ArrayList<Mp3File> hashDups;
+    private HashSet<Mp3File> hashDups;
     private ArrayList<String> inputDirectory;
     private String outputFile;
 
@@ -32,7 +32,7 @@ public class AudioParser {
         this.inputDirectory = inputDirectory;
         this.outputFile = outputFile;
         allHash = new HashSet<>();
-        hashDups = new ArrayList<>();
+        hashDups = new HashSet<>();
     }
 
     public void run() throws IOException {
@@ -61,7 +61,6 @@ public class AudioParser {
                 getParams(p);
                 Mp3File newMp3 = new Mp3File(title, artist, album, duration, p.getPath(), hash);
                 results.add(newMp3);
-                System.out.println("add " + newMp3.getTitle());
                 if (allHash.contains(newMp3.getHash())) {
                     hashDups.add(newMp3);
                 } else {
@@ -154,11 +153,11 @@ public class AudioParser {
         buffer.append("</body></html>");
         //displaying logs (didn't have the time to make them look like in the task)
         if (dups.length() != 0) {
-            logger.info("Duplicates by name found:\n" + dups.toString());
+            logger.info("\nDuplicates by name found:\n" + dups.toString());
         }
         if (!hashDups.isEmpty()) {
             StringBuffer s = new StringBuffer();
-            s.append("Duplicates by checksum found:\n");
+            s.append("\nDuplicates by checksum found:\n");
             for (Mp3File p : hashDups) {
                 s.append(p.getTitle()+" ").append(p.getArtist()+" ").append(p.getAlbum()+" ").append(p.getPath()+"\n");
             }

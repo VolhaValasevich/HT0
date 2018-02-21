@@ -34,20 +34,6 @@ public class Artist {
         return buffer.toString();
     }
 
-    public String getHashDups() {
-        StringBuffer dups = new StringBuffer();
-        String s = "";
-        for (Album v : list.values()) {
-            for (Mp3File p : v.getHashDups()) {
-                dups.append(p.getTitle()).append(p.getArtist()).append(p.getAlbum()).append(p.getPath());
-            }
-        }
-        if (dups.length() != 0) {
-            return s = dups.toString();
-        }
-        return s;
-    }
-
     public String getNameDups() {
         StringBuffer dups = new StringBuffer();
         String s = "";
