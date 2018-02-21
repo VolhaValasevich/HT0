@@ -3,6 +3,7 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.TreeMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,12 +23,16 @@ public class AudioParser {
     private String album;
     private String duration;
     private byte[] hash;
+    private HashSet<byte[]> allHash;               //all hash codes
+    private ArrayList<Mp3File> hashDups;
     private ArrayList<String> inputDirectory;
     private String outputFile;
 
     public AudioParser (ArrayList<String> inputDirectory, String outputFile) {
         this.inputDirectory = inputDirectory;
         this.outputFile = outputFile;
+        allHash = new HashSet<>();
+        hashDups = new ArrayList<>();
     }
 
     public void run() throws IOException {
@@ -54,7 +59,11 @@ public class AudioParser {
             }
             if (Check.ifMp3(p.getName())) {
                 getParams(p);
-                results.add(new Mp3File(title, artist, album, duration, p.getPath(), hash));
+                Mp3File newMp3 = new Mp3File(title, artist, album, duration, p.getPath(), hash);
+                results.add(newMp3);
+                if (allHash.contains(newMp3.getHash())) {
+                    hashDups.add(newMp3);
+                }
             }
         }
         return results;
@@ -76,7 +85,7 @@ public class AudioParser {
             Parser parser = new Mp3Parser();
             ParseContext parseCtx = new ParseContext();
             //sometimes external library method gets into an endless cycle while calculating duration
-            //regardless of file's properties. might need to use another library for reading mp3 tags
+            //seemingly regardless of file's properties. might need to use another library for reading mp3 tags
             parser.parse(input, handler, metadata, parseCtx);
             DigestInputStream dis = new DigestInputStream(input, md);
             hash = md.digest();
@@ -137,13 +146,20 @@ public class AudioParser {
         //generating an html file and log data
         for (Artist p : results.values()) {
             buffer.append(p.out());
-            dups.append(p.getHashDups());
             dups.append(p.getNameDups());
         }
         buffer.append("</body></html>");
-        //displaying logs
+        //displaying logs (didn't have the time to make them look like in the task)
         if (dups.length() != 0) {
-            logger.info("Duplicates found:\n" + dups.toString());
+            logger.info("Duplicates by name found:\n" + dups.toString());
+        }
+        if (!hashDups.isEmpty()) {
+            StringBuffer s = new StringBuffer();
+            s.append("Duplicates by checksum found:\n");
+            for (Mp3File p : hashDups) {
+                s.append(p.getTitle()+" ").append(p.getArtist()+" ").append(p.getAlbum()+" ").append(p.getPath()+"\n");
+            }
+            logger.info(s.toString());
         }
 
         try(FileWriter writer = new FileWriter(outputFile, false))
