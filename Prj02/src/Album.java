@@ -4,9 +4,7 @@ import java.util.TreeMap;
 public class Album {
     private String album;                       //name of the album
     private TreeMap<String, Mp3File> list;      //songs in the album <Song Title, Song>
-    private HashSet<Mp3File> nameDups;
-    //private StringBuffer hashDups;              //checksum duplicates
-    //private StringBuffer nameDups;              //duplicates by title, artist and album
+    private HashSet<Mp3File> nameDups;          //duplicates by title, artist and album
 
     public Album(String name) {
         album = name;
