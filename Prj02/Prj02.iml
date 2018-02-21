@@ -28,7 +28,16 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://D:/Download/org-apache-commons-codec.jar!/" />
+          <root url="jar://D:/Download/log4j-api-2.8.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="jar://D:/Download/log4j-core-2.8.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

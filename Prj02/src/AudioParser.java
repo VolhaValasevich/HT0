@@ -4,7 +4,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.TreeMap;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
@@ -21,22 +22,17 @@ public class AudioParser {
     private String album;
     private String duration;
     private byte[] hash;
-    private String[] inputDirectory;
+    private ArrayList<String> inputDirectory;
     private String outputFile;
 
-    public AudioParser (String[] inputDirectory, String outputFile) {
+    public AudioParser (ArrayList<String> inputDirectory, String outputFile) {
         this.inputDirectory = inputDirectory;
         this.outputFile = outputFile;
     }
 
-    //главная функция
     public void run() throws IOException {
-        //есть ли исходные данные
-        if (inputDirectory.length == 0) {
-            return;
-        }
         ArrayList<Mp3File> results = new ArrayList<>();
-        //для каждой директории добавляем файлы
+        //adding files for each directory
         for (String v: inputDirectory) {
             File searchDirectory = new File(v);
             if (!searchDirectory.isDirectory()) {
@@ -45,51 +41,10 @@ public class AudioParser {
             }
             results.addAll(getFiles(searchDirectory));
         }
-        sortFiles(results);
-        //вывод результатов
-        /*for (Mp3File p : results) {
-            System.out.println(p.toString());
-        }*/
+        writeFiles(results);
     }
 
-    private void sortFiles(ArrayList<Mp3File> list) {
-        TreeMap<String, Artist> results = new TreeMap<>();
-        StringBuffer buffer = new StringBuffer();
-        for (Mp3File v : list) {
-            if (!results.containsKey(v.getArtist())) {
-                results.put(v.getArtist(), new Artist(v.getArtist()));
-            }
-            results.get(v.getArtist()).add(v.getAlbum(), v);
-        }
-        buffer.append("<html><head></head><body>");
-        for (Artist p : results.values()) {
-            buffer.append(p.out());
-        }
-        buffer.append("</body></html>");
-        try(FileWriter writer = new FileWriter(outputFile, false))
-        {
-            writer.write(buffer.toString());
-        }
-        catch(IOException ex){
-            System.out.println("Cannot save results in a file! Please, check the filepath and the directory's properties.");
-        }
-    }
-
-    //проверка расширения mp3 файла
-    public static boolean checkExtension(File f, String ext) {
-        String fileName = f.getName();
-        String extension = "";
-        int i = fileName.lastIndexOf('.');
-        if (i > 0) {
-            extension = fileName.substring(i+1);
-        }
-        if (extension.equals(ext)) {
-            return true;
-        }
-        else return false;
-    }
-
-    //получение параметров файлов из директорий и поддиректорий
+    //getting all file parameters
     public ArrayList<Mp3File> getFiles (File searchDirectory) throws IOException {
         File[] filePaths = searchDirectory.listFiles();
         ArrayList<Mp3File> results = new ArrayList();
@@ -97,7 +52,7 @@ public class AudioParser {
             if (p.isDirectory()) {          //if the directory contains subdirectories, do a recursion
                 results.addAll(getFiles(p));
             }
-            if (checkExtension(p, "mp3")) {
+            if (Check.ifMp3(p.getName())) {
                 getParams(p);
                 results.add(new Mp3File(title, artist, album, duration, p.getPath(), hash));
             }
@@ -105,7 +60,7 @@ public class AudioParser {
         return results;
     }
 
-    //получение атрибутов mp3 файла
+    //getting mp3 tags
     public void getParams(File file) {
 
         try {
@@ -120,8 +75,8 @@ public class AudioParser {
             Metadata metadata = new Metadata();
             Parser parser = new Mp3Parser();
             ParseContext parseCtx = new ParseContext();
-            //sometimes it gets into an endless cycle while getting duration
-            //need to use another library for reading mp3 tags
+            //sometimes external library method gets into an endless cycle while calculating duration
+            //regardless of file's properties. might need to use another library for reading mp3 tags
             parser.parse(input, handler, metadata, parseCtx);
             DigestInputStream dis = new DigestInputStream(input, md);
             hash = md.digest();
@@ -162,6 +117,42 @@ public class AudioParser {
         if (s == null || s.equals("")) {
             return "unknown";
         } else return s;
+    }
+
+    //writing data into logs and output file
+    private void writeFiles(ArrayList<Mp3File> list) {
+        TreeMap<String, Artist> results = new TreeMap<>();
+        StringBuffer buffer = new StringBuffer();
+        StringBuffer dups = new StringBuffer();
+        System.setProperty("log4j.configurationFile", "log4j2.xml");
+        Logger logger = LogManager.getRootLogger();
+        //sorting data by artist and album
+        for (Mp3File v : list) {
+            if (!results.containsKey(v.getArtist())) {
+                results.put(v.getArtist(), new Artist(v.getArtist()));
+            }
+            results.get(v.getArtist()).add(v.getAlbum(), v);
+        }
+        buffer.append("<html><head></head><body>");
+        //generating an html file and log data
+        for (Artist p : results.values()) {
+            buffer.append(p.out());
+            dups.append(p.getHashDups());
+            dups.append(p.getNameDups());
+        }
+        buffer.append("</body></html>");
+        //displaying logs
+        if (dups.length() != 0) {
+            logger.info("Duplicates found:\n" + dups.toString());
+        }
+
+        try(FileWriter writer = new FileWriter(outputFile, false))
+        {
+            writer.write(buffer.toString());
+        }
+        catch(IOException ex){
+            System.out.println("Cannot save results in a file! Please, check the filepath and the directory's properties.");
+        }
     }
 
     public String getTitle() {

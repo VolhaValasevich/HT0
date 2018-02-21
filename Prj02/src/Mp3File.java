@@ -18,8 +18,8 @@ public class Mp3File {
 
     public String out() {
         StringBuffer buffer = new StringBuffer();
-        buffer.append("  ").append(title).append("; ").append(duration).append("; <a href=\"file:///").append(path).append("\">" +
-                "").append(path).append("; </a>").append(hash).append("<br>"); //REMOVE HASH FROM HERE
+        buffer.append("&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp").append(title).append("; ").append(duration).append(";" +
+                " <a href=\"file:///").append(path).append("\">").append(path).append("; </a>").append("<br>");
 
         return buffer.toString();
     }
@@ -48,7 +48,4 @@ public class Mp3File {
         return title;
     }
 
-   /* public void out() {
-        System.out.println(title + " " + duration + " " + path + " " + hash);
-    }*/
 }

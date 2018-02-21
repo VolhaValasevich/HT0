@@ -26,12 +26,28 @@ public class Artist {
 
     public String out() {
         StringBuffer buffer = new StringBuffer();
-        buffer.append("<p>").append(artist).append("<br>");
+        buffer.append("<p>Artist: ").append(artist).append("<br>");
         for (Album v : list.values()) {
             buffer.append(v.out());
         }
         buffer.append("</p>");
         return buffer.toString();
+    }
+
+    public StringBuffer getHashDups() {
+        StringBuffer dups = new StringBuffer();
+        for (Album v : list.values()) {
+            dups.append(v.getHashDups());
+        }
+        return dups;
+    }
+
+    public StringBuffer getNameDups() {
+        StringBuffer dups = new StringBuffer();
+        for (Album v : list.values()) {
+            dups.append(v.getNameDups());
+        }
+        return dups;
     }
 }
 
