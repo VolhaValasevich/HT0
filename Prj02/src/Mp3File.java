@@ -1,41 +1,54 @@
-import java.io.File;
+public class Mp3File {
 
-public class Mp3File { //extends File{
-    /*   Исполнитель1
-    Альбом-1
-     Название-1 Длительность-1 (Ссылка на локальный файл)
-*/
-    String name;
-    String author;
-    String album;
-    String time;
-    String path;
+    private String title;
+    private String artist;
+    private String album;
+    private String duration;
+    private String path;
+    private byte[] hash;
 
-    public Mp3File (String name, String author, String album, String time, String path) {
-        this.name = name;
-        this.author = author;
+    public Mp3File (String name, String author, String album, String time, String path, byte[] hash) {
+        this.title = name;
+        this.artist = author;
         this.album = album;
-        this.time = time;
+        this.duration = time;
         this.path = path;
+        this.hash = hash;
     }
 
-    public String getName() {
-        return name;
+    public String out() {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("  ").append(title).append("; ").append(duration).append("; <a href=\"file:///").append(path).append("\">" +
+                "").append(path).append("; </a>").append(hash).append("<br>"); //REMOVE HASH FROM HERE
+
+        return buffer.toString();
     }
 
-    public String getAuthor() {
-        return author;
+    public String getArtist() {
+        return artist;
     }
 
     public String getAlbum() {
         return album;
     }
 
-    public String getTime() {
-        return time;
+    public String getDuration() {
+        return duration;
     }
 
     public String getPath() {
         return path;
     }
+
+    public byte[] getHash() {
+        return hash;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+   /* public void out() {
+        System.out.println(title + " " + duration + " " + path + " " + hash);
+    }*/
 }
