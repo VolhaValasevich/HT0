@@ -56,15 +56,20 @@ public class AudioParser {
 
     //getting all file parameters
     public ArrayList<Mp3File> getFiles (File searchDirectory) {
-        File[] filePaths = searchDirectory.listFiles();
+        File[] filePaths = {};
         ArrayList<Mp3File> results = new ArrayList();
+        try {
+            filePaths = searchDirectory.listFiles();
+            if (filePaths == null) {
+                throw new Exception();
+            }
+        } catch (Exception e) {
+            System.out.println("Cannot reach files in directory " + searchDirectory.getPath() + ". Check its properties.");
+            return results;
+        }
         for(File p : filePaths) {
             if (p.isDirectory()) {          //if the directory contains subdirectories, do a recursion
-                try {
-                    results.addAll(getFiles(p));
-                } catch (Exception e) {
-                    System.out.println("Cannot reach files in directory " + p);
-                }
+                results.addAll(getFiles(p));
             }
             if (Check.ifMp3(p.getName())) {
                 try {
