@@ -35,7 +35,7 @@ public class AudioParser {
         hashDups = new HashSet<>();
     }
 
-    public void run() throws IOException {
+    public void run() {
         ArrayList<Mp3File> results = new ArrayList<>();
         //adding files for each directory
         for (String v: inputDirectory) {
@@ -60,7 +60,11 @@ public class AudioParser {
         ArrayList<Mp3File> results = new ArrayList();
         for(File p : filePaths) {
             if (p.isDirectory()) {          //if the directory contains subdirectories, do a recursion
-                results.addAll(getFiles(p));
+                try {
+                    results.addAll(getFiles(p));
+                } catch (Exception e) {
+                    System.out.println("Cannot reach files in directory " + p);
+                }
             }
             if (Check.ifMp3(p.getName())) {
                 try {

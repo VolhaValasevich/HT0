@@ -2,7 +2,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class Main {
-    public static void main (String[] args) throws IOException {
+    public static void main (String[] args) {
         ArrayList<String> path = new ArrayList<>();
         String output = "output.html";       //default output file name
        // path.add("E:/Music1");
@@ -29,6 +29,5 @@ public class Main {
         }
         AudioParser parser = new AudioParser(path, output);
         parser.run();
-
     }
 }
