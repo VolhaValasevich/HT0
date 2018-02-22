@@ -46,11 +46,16 @@ public class AudioParser {
             }
             results.addAll(getFiles(searchDirectory));
         }
-        writeFiles(results);
+        if (!results.isEmpty()) {
+            writeFiles(results);
+        } else {
+            System.out.println("No .mp3 files have been found in these directories.");
+            return;
+        }
     }
 
     //getting all file parameters
-    public ArrayList<Mp3File> getFiles (File searchDirectory) throws IOException {
+    public ArrayList<Mp3File> getFiles (File searchDirectory) {
         File[] filePaths = searchDirectory.listFiles();
         ArrayList<Mp3File> results = new ArrayList();
         for(File p : filePaths) {
@@ -58,13 +63,19 @@ public class AudioParser {
                 results.addAll(getFiles(p));
             }
             if (Check.ifMp3(p.getName())) {
-                getParams(p);
-                Mp3File newMp3 = new Mp3File(title, artist, album, duration, p.getPath(), hash);
-                results.add(newMp3);
-                if (allHash.contains(newMp3.getHash())) {
-                    hashDups.add(newMp3);
-                } else {
-                    allHash.add(newMp3.getHash());
+                try {
+                    getParams(p);
+                    Mp3File newMp3 = new Mp3File(title, artist, album, duration, p.getPath(), hash);
+                    results.add(newMp3);
+                    if (allHash.contains(newMp3.getHash())) {
+                        hashDups.add(newMp3);
+                    } else {
+                        allHash.add(newMp3.getHash());
+                    }
+                } catch (SAXException | TikaException e) {
+                    System.out.println("Cannot get mp3 info from file " + p.getPath() + ". Check if it is damaged.");
+                } catch (IOException e) {
+                    System.out.println("Cannot open or read file " + p.getPath() + ". Check its properties or if it is damaged.");
                 }
             }
         }
@@ -72,9 +83,7 @@ public class AudioParser {
     }
 
     //getting mp3 tags
-    public void getParams(File file) {
-
-        try {
+    public void getParams(File file) throws IOException, TikaException, SAXException {
             InputStream input = new FileInputStream(file);
             MessageDigest md = null;
             try {
@@ -107,9 +116,6 @@ public class AudioParser {
             } catch (NullPointerException ex) {
                 duration = "unknown";
             }
-        } catch (SAXException | IOException | TikaException e) {
-            e.printStackTrace();
-        }
     }
 
     //converting a number into a time format
